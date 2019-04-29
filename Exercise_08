@@ -1,0 +1,107 @@
+//C-Exercise 08
+
+function V_0 = CRR_EmCall(S_0, r, sigma, T, M, K, EU)
+ 
+    delta_t = T/M
+    alpha = exp(r*delta_t)
+    b = 0.5*(1/alpha+ alpha*exp((sigma^2)*delta_t))
+    u = b+sqrt(b^2-1)
+    d=1/u
+    q=(exp(r*delta_t)-d)/(u-d)
+    
+    //calculate stock price
+    for i = 1:M+1
+        for j = 1:i
+            S(j,i) = S_0*(u^(j-1))*(d^(i-j))
+        end;
+    end
+    //calculate payoff at the end
+    for j=1:M+1
+        V(j,M+1) = max((S(j,M+1)-K),0)
+    end
+    //calculate option price
+        for i = M:-1:1
+            for j = 1:i
+                V(j,i) = exp(-r*delta_t)*((q*V(j+1,i+1))+(1-q)*V(j,i+1))
+            end;
+         end
+V_0 = V(1,1)
+endfunction
+
+/////////////////////////////////////
+
+function V_0 = CRR_EuCall_altcond(S_0, r, sigma, T, M, K)
+
+    delta_t = T/M;
+    alpha = exp(r*delta_t)
+    // from T-Exercise05 part (b) we have gamma(g) , u , q below:
+    g = (K/S_0)^(2/M)
+    b = 0.5 * (g/alpha + alpha*exp(sigma^2*delta_t))
+    u = b + sqrt(b^2-g)
+    d= g/u
+    q=(alpha-d / (u-d))
+    
+    
+//calculate stock price
+    for i = 1:M+1
+        for j = 1:i
+            S(j,i) = S_0*(u^(j-1))*(d^(i-j))
+        end;
+    end
+    //calculate payoff at the end
+    for j=1:M+1
+        V(j,M+1) = max((S(j,M+1))-K,0)
+    end
+    
+    for i = M:-1:1
+        for j = 1:i
+           V(j,i) = exp(-r*delta_t)*((q*V(j+1,i+1))+(1-q)*V(j,i+1))
+        end;
+    end
+V_0 = V(1,1)
+endfunction
+
+function PriceBS = BS(S_0, r, sigma, T, K)
+
+d1 = (log(S0/K) + (r+(0.5*sigma^2))*T)/(sigma*sqrt(T))
+d2 = d1-sigma*sqrt(T)
+
+PriceBS = S0*cdfnor("PQ",d1,0,1) - K*exp(-r*T)*cdfnor("PQ",d2,0,1)
+
+endfunction
+
+////////////////
+S_0=100
+r=0.03
+sigma=0.3
+T=1
+M=100
+
+K=70:200
+
+V0 = zeros(K)
+V0_altcond = zeros(K)
+PriceBS = zeros(K)
+
+for j=1:length(K)
+    V0(j) = CRR_EmCall(S_0, r, sigma, T, M, K(j))
+end
+
+for j=1:length(K)
+    V0_altcond(j) = CRR_EuCall_altcond(S_0, r, sigma, T, M, K(j))
+end
+
+for i=1:length(K)
+    PriceBS(i) =  BS(S_0, r, sigma, T, K(i))
+end
+////////
+
+error_1 = V0-PriceBS
+error_2 = V0_altcond-PriceBS
+
+plot(K,error_1)
+plot(K,error_2,'red')
+title("An error of each approximation against the BS-price")
+xlabel("Strike price")
+ylabel("Error")
+legend("Old method", "new condition",4)
