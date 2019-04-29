@@ -1,0 +1,18 @@
+// Exercise_09
+
+function y=f(x)
+    y=(max( (S0*exp((r-(sigma^2)/2)/T + sigma*sqrt(T)*x))-K ,0))*exp(-r*T)*exp((-x^2)/2)
+endfunction
+
+function V0 = Price_BS_Int (S0, r, sigma, T, f)
+    V0 = 1/sqrt(2*%pi)*intg(-100,100,f)
+endfunction
+
+
+S0 = 100
+r = 0.05
+sigma = 0.2
+T=1
+K=100
+
+Price_BS_Int (S0, r, sigma, T, f)
