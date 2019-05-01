@@ -96,9 +96,13 @@ for i=1:length(K)
 end
 ////////
 
+/// find error between old method and B-S price
 error_1 = V0-PriceBS
+
+// find error between new condition and B-s price
 error_2 = V0_altcond-PriceBS
 
+//Plotting graph
 plot(K,error_1)
 plot(K,error_2,'red')
 title("An error of each approximation against the BS-price")
