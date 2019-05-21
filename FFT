@@ -1,0 +1,75 @@
+//Defining a function that computes prices of European calls in the B-S model using the FFT
+function V0 = BS_EuCall_FFT (S0, r, sigma, T, K, R, N, M)
+    Delta=M/N;
+    kappa_1=log(S0)-(N/2)*2*%pi/M;
+    //kappa_1=log(min(K));
+    kappa=kappa_1+((1:N)-1)*2*%pi/M;
+    
+    //Defining the function g , cf. (4.11).
+    function y =g(u)
+        // Laplace transform of the function f_0(x) = (e^x - e^0)^+,
+        // cf. (4.9).
+        function x = f_tilde_0(z)
+            x = 1 / (z*(z-1));
+        endfunction
+        
+        // Characteristic function of log(S(T)) in the Black-Scholes model,
+        // cf. (4.7).
+        function v = chi (u)
+            v = exp( %i*u*(log(S0)+r*T) - (%i*u+u^2)*sigma^2/2*T );
+        endfunction       
+        
+        y=ones(1,length(u))
+        for i=1:length(u)
+            y(i)=f_tilde_0(R+%i*u(i))*chi(u(i)-%i*R)
+        end
+         
+    endfunction
+    
+    //Defining x according to (4.15)
+    x=g(((1:N)-1/2)*Delta)*Delta.*exp(-%i*((1:N)-1)*Delta*kappa_1);
+        
+    //Computing the discrete fourier transform of x
+    x_hat=fft(x);
+    
+    //Computing the prices of options with values in kappa, cf. (4.16)
+    V_kappa=1/%pi*exp(-r*T+(1-R)*kappa).*real(x_hat.*exp(-%i/2*Delta*kappa));
+    
+    //Computing the prices of option with value in K using linear interpolation in log-strikes
+    V0=interpln([kappa; V_kappa],log(K));
+   
+endfunction
+
+// test parameters
+S0 = 100;
+r = 0.05;
+sigma = 0.2;
+T = 1;
+K = 80:130;
+R = 1.1;
+N = 2^11;
+M = 50;
+
+//Testing the function and saving the elapsed time
+tic()
+V1=BS_EuCall_FFT(S0, r, sigma, T, K, R, N, M)
+time1=toc();
+
+//Comparing the run time of the FFT method with the integration formula
+exec("CompFin_2017_SS_BS_Price_Int.sce")
+V2=zeros(K);
+j=1;
+tic()
+for i=K
+    function y=g(x)
+        y=max(0,x-i)
+    endfunction
+    V2(j)=BS_Price_Int (r, sigma, S0, T, g);
+    j=j+1;
+end
+time2=toc();
+
+//We observe that the FFT is much faster than numerical integration if we want to value multiple Calls.
+disp("Computing the Call prices using the FFT takes "+string(time1)+" seconds. Computing the Call prices using the integration formula takes "+string(time2)+" seconds.")
+
+
