@@ -64,3 +64,11 @@ for j=K
     V2(i)=BS_Price_Int(S0, r, sigma, T, g);
     i=i+1;
 end
+
+//plotting both computations
+plot(K, V1)
+plot(K, V2, 'red')
+title("Comparison of FFT and Black-Scholes integration formula")
+xlabel("Strikes")
+ylabel("Value of option at time 0")
+legend("FFT", "BS integration", 4)
