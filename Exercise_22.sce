@@ -1,4 +1,9 @@
+//C-Exercise22
+//Jurain Kahl
+//Nattawut Phanrattinon
 funcprot(0);
+
+exec("CompFin_2019_SS_BS_Price_Int.sce")
 //computes the initial price of European call options with identicall maturity T and strikes K = (K1, ..., Kn)
 function V0 = BS_EuCall_FFT (S0, r, sigma, T, K, R, N, M, kappa1)
     //model parameters delta and kappa (4.15)
@@ -48,3 +53,14 @@ M = 50;
 kappa1 = log(80);
 
 V1 = BS_EuCall_FFT (S0, r, sigma, T, K, R, N, M, kappa1)
+
+//payoff for European call using Black-Scholes integration formula
+V2 = zeros(K);
+i=1;
+for j=K
+    function y = g(x)
+        y=max(0,x-j);
+    endfunction
+    V2(i)=BS_Price_Int(S0, r, sigma, T, g);
+    i=i+1;
+end
