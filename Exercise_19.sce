@@ -1,7 +1,3 @@
-//C-Exercise19
-//Jurain Kahl
-//Nattawut Phanrattinon
-
 function V0 = BS_EuCall_Laplace (St, r, sigma, T, K, R)
     
     function y = f_tilde(z)
@@ -50,4 +46,14 @@ T = 1;
 K = 100;
 R = 1.1;
 
-BS_EuCall_Laplace (S0, r, sigma, T, K, R)
+V0= BS_EuCall_Laplace (S0, r, sigma, T, K, R);
+
+//Load Function to calculate price by using BS 
+exec("CompFin_2019_SS_BS_Price_Int.sce")
+ function y = g(x)
+        y=max(0,x-K);
+    endfunction
+
+V1 = BS_Price_Int(S0, r, sigma, T, g);
+
+disp("Initial price of a EU call option by Laplace transform approach is " + string(V0) + ", Initial price of a EU call option by BS is " + string(V1));
