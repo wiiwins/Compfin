@@ -1,5 +1,5 @@
 //Exercise22
-//Jurain Kahl
+//Jurian Kahl
 //Phanrattinon Nattawut
 
 //define Function Black-Sholes price
