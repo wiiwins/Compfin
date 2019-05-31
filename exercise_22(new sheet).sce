@@ -34,8 +34,8 @@ r = 0;
 sigma0 = 0.3;
 data = csvRead("./Dax_CallPrices_Eurex.csv",';',',');
 K = data(2:$,1);
-V = data(2:$,3);
 T = data(2:$,2);
+V = data(2:$,3);
 
 // Calibrate data
 sigma = EuCall_BS_Calibrate (S0, r, T, K, V, sigma0);
