@@ -1,0 +1,56 @@
+//C-Exercise29
+//Jurian Kahl
+//Nattawut Phanrattinon
+
+funcprot(0)
+// Define density of the truncated normal distribution
+function y = TruncNormal(x,a,b,mu,sigma)
+      if a<=x<=b then
+        z = cdfnor("PQ",(b-mu)/sigma,0,1)-cdfnor("PQ",(a-mu)/sigma,0,1);
+        y = (1/sqrt(2*%pi))*exp(-((((x-mu)/sigma)^2)/2))/sigma*z;
+    else
+        0;
+    end
+endfunction
+
+
+function x = Sample_TruncNormal_AR(a, b, mu, sigma, N)
+    // Define constant C by using Mode of truncated normal distribution
+    if a<mu then
+        x_c = a;
+    elseif a <= mu <= b then
+            x_c = mu;
+    else
+        x_c = b
+    end 
+    
+    C = TruncNormal(x_c,a,b,mu,sigma)
+    
+    //Generate Sampling
+    function x = sampling()
+        success = %F
+        while success == %T
+            U = rand(2,1);
+            success = (U(2) <= TruncNormal(U(1),a,b,mu,sigma))/C
+        end
+        x = U(1);
+    endfunction
+    
+    X = zeros(N,1);
+    for n=1:N
+        X(n) = sampling();
+    end
+endfunction
+
+// Testing 
+a = 0
+b = 2
+mu = 0.5
+sigma = 1
+N = 2000
+
+// Ploting Histogram
+clf();
+histplot(30,X);
+xlabel("x"); ylabel("Frequency");
+title("Histogram of the acceptance/rejection method");
