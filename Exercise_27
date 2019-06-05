@@ -1,0 +1,50 @@
+//C-Exercise27
+//Jurian Kahl
+//Nattawut Phanrattinon
+
+function [V0, c1, c2] = Eu_Option_BS_MC(S0, r, sigma, T, K, M, f)
+    X = grand(M, 1, 'nor', 0, 1);
+    S_T = S0*exp( (r-0.5*sigma^2)*T + sigma*sqrt(T)*X );
+    
+    Y = exp(-r*T)*g(S_T);
+    V0 = mean(Y);
+    
+    epsilon = 1.96 * sqrt(variance(Y)/M);
+    c1=V0-epsilon;
+    c2=V0+epsilon;
+    
+endfunction
+
+// set parameters
+K = 90;
+S0 = 100;
+r = 0.05;
+sigma = 0.2;
+T = 1;
+M = 100000;
+
+function y=f(x)
+    y=max(x-K,0)
+endfunction
+
+
+[V0, c1, c2] = Eu_Option_BS_MC(S0, r, sigma, T, K, M, f)
+disp("Price of European Call by Monte-Carlo simulation: " + string(V0) + ",  with " + "[" +string(c1)+","+string(c2) + "]" + " 95% confidence interval");
+
+
+//Define function to calculate BS Call Option
+function V0 = BS_Eu_Call(t, S_t, r, sigma, T, K)
+
+    function p = Phi(x)
+        p = cdfnor("PQ", x, zeros(x), ones(x));
+    endfunction
+    
+    // Using (3.23) to calculate BS price
+    d1 = ( log(S_t./K) + (r+1/2*sigma^2)*(T-t) ) ./ ( sigma*sqrt(T-t) );
+    d2 = ( log(S_t./K) + (r-1/2*sigma^2)*(T-t) ) ./ ( sigma*sqrt(T-t) );
+    V0 = S_t.*Phi(d1) - K.*exp(-r*(T-t)).*Phi(d2);
+    
+endfunction
+
+V0 = BS_Eu_Call (0, S0, r, sigma, T, K);
+disp("European Call price by using BS-Formula: " + string(V0));
