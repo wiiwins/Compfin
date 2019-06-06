@@ -53,5 +53,5 @@ X = Sample_TruncNormal_AR(a, b, mu, sigma, N)
 // Plot histogram 
 clf();
 histplot(50,X);
-xlabel("x"); ylabel("Frequency / density");
-title("Illustration of the acceptance/rejection method to sample from the Beta distribution");
+xlabel("x"); ylabel("Density");
+title("Histogram of the acceptance/rejection method");
