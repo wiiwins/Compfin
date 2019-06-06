@@ -29,7 +29,7 @@ endfunction
 
 
 [V0, c1, c2] = Eu_Option_BS_MC(S0, r, sigma, T, K, M, f)
-disp("Price of European Call by Monte-Carlo simulation: " + string(V0) + ",  with " + "[" +string(c1)+","+string(c2) + "]" + " 95% confidence interval");
+disp("Price of European Call by Monte Carlo approach: " + string(V0) + ",  with " + "[" +string(c1)+","+string(c2) + "]" + " 95% confidence interval");
 
 
 //Define function to calculate BS Call Option
