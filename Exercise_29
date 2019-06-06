@@ -5,16 +5,11 @@
 funcprot(0)
 // Define density of the truncated normal distribution
 function y = TruncNormal(x,a,b,mu,sigma)
-      if a<=x<=b then
         z = cdfnor("PQ",(b-mu)/sigma,0,1)-cdfnor("PQ",(a-mu)/sigma,0,1);
         y = (1/sqrt(2*%pi))*exp(-((((x-mu)/sigma)^2)/2))/sigma*z;
-    else
-        0;
-    end
 endfunction
 
-
-function x = Sample_TruncNormal_AR(a, b, mu, sigma, N)
+function X = Sample_TruncNormal_AR(a, b, mu, sigma, N)
     // Define constant C by using Mode of truncated normal distribution
     if a<mu then
         x_c = a;
@@ -25,32 +20,38 @@ function x = Sample_TruncNormal_AR(a, b, mu, sigma, N)
     end 
     
     C = TruncNormal(x_c,a,b,mu,sigma)
-    
-    //Generate Sampling
-    function x = sampling()
+
+    // Generate one sample
+    function x = Sample()
         success = %F
-        while success == %T
+        while ~success
             U = rand(2,1);
-            success = (U(2) <= TruncNormal(U(1),a,b,mu,sigma))/C
+            success = ( U(2) <= TruncNormal(U(1),a,b,mu,sigma)/C );
         end
         x = U(1);
+        
     endfunction
     
+    // Generate N samples.
     X = zeros(N,1);
     for n=1:N
-        X(n) = sampling();
+        X(n) = Sample();
     end
+    
 endfunction
 
-// Testing 
+// Test parameters.
 a = 0
 b = 2
 mu = 0.5
 sigma = 1
 N = 2000
 
-// Ploting Histogram
+// Generate N samples.
+X = Sample_TruncNormal_AR(a, b, mu, sigma, N)
+
+// Plot histogram 
 clf();
-histplot(30,X);
-xlabel("x"); ylabel("Frequency");
-title("Histogram of the acceptance/rejection method");
+histplot(50,X);
+xlabel("x"); ylabel("Frequency / density");
+title("Illustration of the acceptance/rejection method to sample from the Beta distribution");
