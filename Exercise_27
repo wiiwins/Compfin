@@ -6,7 +6,7 @@ function [V0, c1, c2] = Eu_Option_BS_MC(S0, r, sigma, T, K, M, f)
     X = grand(M, 1, 'nor', 0, 1);
     S_T = S0*exp( (r-0.5*sigma^2)*T + sigma*sqrt(T)*X );
     
-    Y = exp(-r*T)*g(S_T);
+    Y = exp(-r*T)*f(S_T);
     V0 = mean(Y);
     
     epsilon = 1.96 * sqrt(variance(Y)/M);
@@ -15,7 +15,7 @@ function [V0, c1, c2] = Eu_Option_BS_MC(S0, r, sigma, T, K, M, f)
     
 endfunction
 
-// set parameters
+// test parameters
 K = 90;
 S0 = 100;
 r = 0.05;
