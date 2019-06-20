@@ -2,18 +2,19 @@
 //Jurian Kahl
 //Phanrattinon Nattawut
 
+funcprot(0)
 function V0 = BS_EuOption_MC_CV (S0, r, sigma, T, K, M, f, g)
     
     X = grand(M, 1, 'nor', 0, 1);
     ST = S0*exp( (r-0.5*sigma^2)*T + sigma*sqrt(T)*X );
-    Covar = mean( (f(ST)-mean(f(ST))) .* (g(ST)-mean(g(ST))) );
-    beta = Covar / variance(f(ST));
+    Cov = mean( (f(ST)-exp(r*T).*mean(f(ST))) .* (g(ST)-mean(g(ST))) );
+    b = Cov / variance(f(ST));
 
     // Using max(ST-K,0) as control variate.
     X = grand(M, 1, 'nor', 0, 1);
     ST = S0*exp( (r-0.5*sigma^2)*T + sigma*sqrt(T)*X );
-    dif = g(ST)-beta*f(ST);
-    V0 = exp(-r*T)*mean(dif) + mean(exp(-r*T)*f(ST));
+    dif = g(ST)- b.*f(ST);
+    V0 = exp(-r*T)*mean(dif) + b*mean(exp(-r*T).*f(ST));
     
 endfunction
 
@@ -35,7 +36,7 @@ function y=f(x)
 endfunction
 
 // display result for test parameters
-V0 = BS_EuOption_MC_CV (S0, r, sigma, T, K, M, f, g);
+V0 = BS_EuOption_MC_CV (S0, r, sigma, T, K, M, f, g)
 disp("European call price by useing Monte-Carlo simulation with control variate: " + string(V0));
 
 //plain Monte-Carlo from C-Exercise 27
