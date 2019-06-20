@@ -35,7 +35,7 @@ function y=f(x)
 endfunction
 
 // display result for test parameters
-V0 = BS_EuOption_MC_CV (S0, r, sigma, T, K, M, g);
+V0 = BS_EuOption_MC_CV (S0, r, sigma, T, K, M, f, g);
 disp("European call price by useing Monte-Carlo simulation with control variate: " + string(V0));
 
 //plain Monte-Carlo from C-Exercise 27
